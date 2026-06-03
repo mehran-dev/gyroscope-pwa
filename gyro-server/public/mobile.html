@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mobile Sender</title>
+  </head>
+  <body>
+    <h2>Gyro Sender</h2>
+    <button id="start">Enable Gyro</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      function send(data) {
+        socket.emit("gyro:data", data);
+      }
+
+      function handle(e) {
+        send({
+          alpha: e.alpha,
+          beta: e.beta,
+          gamma: e.gamma,
+        });
+      }
+
+      document.getElementById("start").onclick = async () => {
+        if (typeof DeviceOrientationEvent.requestPermission === "function") {
+          const res = await DeviceOrientationEvent.requestPermission();
+          if (res !== "granted") return;
+        }
+
+        window.addEventListener("deviceorientation", handle);
+      };
+    </script>
+  </body>
+</html>

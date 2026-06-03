@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Phone State Dashboard</title>
+    <style>
+      body {
+        background: #111;
+        color: white;
+        font-family: sans-serif;
+        text-align: center;
+      }
+
+      .box {
+        width: 200px;
+        height: 200px;
+        margin: 50px auto;
+        background: linear-gradient(45deg, #0ff, #00f);
+        border-radius: 10px;
+        transform-style: preserve-3d;
+      }
+
+      .data {
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📱 Live Phone State</h1>
+
+    <div class="box" id="box"></div>
+
+    <div class="data">alpha: <span id="a">0</span></div>
+    <div class="data">beta: <span id="b">0</span></div>
+    <div class="data">gamma: <span id="g">0</span></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      const box = document.getElementById("box");
+
+      socket.on("state:update", (data) => {
+        document.getElementById("a").textContent = data.alpha?.toFixed(2);
+        document.getElementById("b").textContent = data.beta?.toFixed(2);
+        document.getElementById("g").textContent = data.gamma?.toFixed(2);
+
+        box.style.transform = `
+        rotateX(${data.beta}deg)
+        rotateY(${data.gamma}deg)
+        rotateZ(${data.alpha}deg)
+      `;
+      });
+    </script>
+  </body>
+</html>

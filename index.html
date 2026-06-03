@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gyroscope PWA</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#111" />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #111;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      #box {
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(45deg, #00f, #0ff);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        transform-style: preserve-3d;
+        transition: transform 0.1s linear;
+      }
+
+      .data {
+        font-size: 14px;
+        opacity: 0.8;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin-bottom: 20px;
+        background: #0ff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: #000;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="startBtn">Enable Gyroscope</button>
+
+    <div id="box"></div>
+
+    <div class="data">alpha: <span id="alpha">0</span></div>
+    <div class="data">beta: <span id="beta">0</span></div>
+    <div class="data">gamma: <span id="gamma">0</span></div>
+
+    <script>
+      const box = document.getElementById("box");
+      const alphaEl = document.getElementById("alpha");
+      const betaEl = document.getElementById("beta");
+      const gammaEl = document.getElementById("gamma");
+      const startBtn = document.getElementById("startBtn");
+
+      function handleOrientation(event) {
+        const { alpha, beta, gamma } = event;
+
+        alphaEl.textContent = alpha?.toFixed(2);
+        betaEl.textContent = beta?.toFixed(2);
+        gammaEl.textContent = gamma?.toFixed(2);
+
+        // rotate box visually
+        box.style.transform = `
+        rotateX(${beta}deg)
+        rotateY(${gamma}deg)
+        rotateZ(${alpha}deg)
+      `;
+      }
+
+      function enableGyro() {
+        // iOS requires permission
+        if (
+          typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function"
+        ) {
+          DeviceOrientationEvent.requestPermission()
+            .then((permissionState) => {
+              if (permissionState === "granted") {
+                window.addEventListener("deviceorientation", handleOrientation);
+                startBtn.style.display = "none";
+              }
+            })
+            .catch(console.error);
+        } else {
+          // Android / others
+          window.addEventListener("deviceorientation", handleOrientation);
+          startBtn.style.display = "none";
+        }
+      }
+
+      startBtn.addEventListener("click", enableGyro);
+
+      // Register service worker
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+      }
+    </script>
+  </body>
+</html>
