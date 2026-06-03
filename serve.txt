@@ -1,0 +1,1 @@
+serve . --ssl-cert certs/cert.pem --ssl-key certs/key.pem

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speedometer</title>
+
+    <style>
+      body {
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+
+      .speed {
+        font-size: 80px;
+        font-weight: bold;
+      }
+
+      .unit {
+        font-size: 20px;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="speed" id="speed">0</div>
+    <div class="unit">km/h</div>
+
+    <script>
+      let lastSpeed = 0;
+
+      // گرفتن موقعیت از GPS
+      if ("geolocation" in navigator) {
+        navigator.geolocation.watchPosition(
+          (pos) => {
+            // سرعت GPS به m/s هست
+            if (pos.coords.speed !== null && pos.coords.speed >= 0) {
+              lastSpeed = pos.coords.speed * 3.6; // تبدیل به km/h
+            }
+          },
+          (err) => {
+            console.log("GPS error:", err);
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 5000,
+          },
+        );
+      } else {
+        alert("Geolocation not supported");
+      }
+
+      // آپدیت UI هر 100ms
+      setInterval(() => {
+        document.getElementById("speed").innerText = lastSpeed.toFixed(1);
+      }, 100);
+    </script>
+  </body>
+</html>
